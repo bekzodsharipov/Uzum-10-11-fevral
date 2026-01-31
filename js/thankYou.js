@@ -1,22 +1,39 @@
-const SHEET_URL =
-  "https://script.google.com/macros/s/AKfycbwtlyYwY8RsrYpCy-UQX4G0ETF_9DMpR_Qf-cnQi7TS9U5ZN_m466DaUTE-0Wl8Hy6a/exec";
-
 async function sendFormData() {
-  const o = localStorage.getItem("formData");
-  if (!o) return void console.log("Malumotlar yoq");
-  const a = JSON.parse(o),
-    e = new FormData();
-  e.append("sheetName", "Lead"),
-  e.append("Ism", a.Ism),
-  e.append("Telefon raqam", a.TelefonRaqam),
-    e.append("Royhatdan o'tgan vaqti", a.SanaSoat);
+  const formDataRaw = localStorage.getItem("formData");
+  if (!formDataRaw) {
+    return;
+  }
+
+  const formDataObj = JSON.parse(formDataRaw);
+
+
+  // Prepare FormData for API
+  const formData = new FormData();
+  formData.append("sheetName", "Lead");
+  formData.append("Ism", formDataObj.Ism);
+  formData.append("Telefon raqam", formDataObj.TelefonRaqam);
+  formData.append("Royhatdan o'tgan vaqti", formDataObj.SanaSoat);
+
   try {
-    if (!(await fetch(SHEET_URL, { method: "POST", body: e })).ok)
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbwtlyYwY8RsrYpCy-UQX4G0ETF_9DMpR_Qf-cnQi7TS9U5ZN_m466DaUTE-0Wl8Hy6a/exec",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+    
+    
+    if (response.ok) {
+      localStorage.removeItem("formData");
+    } else {
       throw new Error("API response was not ok");
-    localStorage.removeItem("formData");
-  } catch (o) {
-    console.error("Error submitting form:", o),
-      (document.getElementById("errorMessage").style.display = "block");
+    }
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    document.getElementById("errorMessage").style.display = "block";
   }
 }
+
+// Send data when page loads
 window.onload = sendFormData;
