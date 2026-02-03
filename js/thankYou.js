@@ -1,16 +1,13 @@
 async function sendFormData() {
   const formDataRaw = localStorage.getItem("formData");
-  if (!formDataRaw) {
-    return;
-  }
+  if (!formDataRaw) return;
 
   const formDataObj = JSON.parse(formDataRaw);
 
-
-  // Prepare FormData for API
   const formData = new FormData();
   formData.append("sheetName", "Lead");
-  formData.append("Ism", formDataObj.Ism);
+
+  // ✅ faqat shu 2ta maydon ketadi
   formData.append("Telefon raqam", formDataObj.TelefonRaqam);
   formData.append("Royhatdan o'tgan vaqti", formDataObj.SanaSoat);
 
@@ -22,8 +19,7 @@ async function sendFormData() {
         body: formData,
       }
     );
-    
-    
+
     if (response.ok) {
       localStorage.removeItem("formData");
     } else {
@@ -31,7 +27,8 @@ async function sendFormData() {
     }
   } catch (error) {
     console.error("Error submitting form:", error);
-    document.getElementById("errorMessage").style.display = "block";
+    const errEl = document.getElementById("errorMessage");
+    if (errEl) errEl.style.display = "block";
   }
 }
 
